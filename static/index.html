@@ -6,6 +6,7 @@
     <title>Poem Streaming</title>
 </head>
 <body>
+    <main style="width:500px;margin:auto">
     <h1>Poem Generator</h1>
     
     <form id="poemForm">
@@ -20,10 +21,11 @@
         <button type="submit">Generate Poem</button>
     </form>
 
-    <div id="result"></div>
+    <pre style="background:#ddd;width:100%" id="result"></pre>
+    </main>
 
     <script>
-        document.getElementById('poemForm').addEventListener('submit', function(e) {
+        document.getElementById('poemForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const lineNumber = document.getElementById('line_numbr').value;
@@ -34,47 +36,44 @@
             
             // Prepare the data as JSON
             const jsonData = {
-                line_number: Number(lineNumber),
-                text: text,
+                line_number: lineNumber,
+                text: text
             };
             
-            // Make the POST request with JSON
-            fetch('/poems_stream', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jsonData)
-            })
-            .then(response => {
+            try {
+                // Make the POST request with JSON
+                const response = await fetch('/poems_stream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+                
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 
-                // Create an event source for SSE
-                const eventSource = new EventSource('/poems_stream');
+                // Handle the streaming response
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
                 
-                // Listen for messages from the server
-                eventSource.onmessage = function(event) {
-                    // Append the received text to the result div
-                    resultDiv.textContent += event.data;
-                };
-                
-                // Handle errors
-                eventSource.onerror = function(error) {
-                    console.error('EventSource error:', error);
-                    eventSource.close();
-                };
-                
-                // Handle when the connection is closed by the server
-                eventSource.addEventListener('close', function() {
-                    eventSource.close();
-                });
-            })
-            .catch(error => {
+                // Read the stream
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) {
+                        break;
+                    }
+                    
+                    // Decode and display the chunk
+                    const text = decoder.decode(value, { stream: true });
+                    resultDiv.textContent += text;
+                }
+            } catch (error) {
                 console.error('Error:', error);
                 resultDiv.textContent = 'An error occurred while fetching the poem.';
-            });
+            }
         });
     </script>
 </body>

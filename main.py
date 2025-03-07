@@ -55,7 +55,8 @@ async def chat(chat: Chat):
 
     def stream_chat():
         for token in model.stream(prompt):
-            yield f"event: newtext\ndata: {token.content}\n\n"
+            #yield f"event: newtext\ndata: {token.content}\n\n"
+            yield token.content
             sleep(1)
 
 
