@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poem Streaming</title>
+</head>
+<body>
+    <h1>Poem Generator</h1>
+    
+    <form id="poemForm">
+        <div>
+            <label for="line_numbr">Number of Lines:</label>
+            <input type="number" id="line_numbr" name="line_numbr" required>
+        </div>
+        <div>
+            <label for="text">Topic:</label>
+            <input type="text" id="text" name="text" required>
+        </div>
+        <button type="submit">Generate Poem</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('poemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const lineNumber = document.getElementById('line_numbr').value;
+            const text = document.getElementById('text').value;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = '';
+            
+            // Prepare the data as JSON
+            const jsonData = {
+                line_number: Number(lineNumber),
+                text: text,
+            };
+            
+            // Make the POST request with JSON
+            fetch('/poems_stream', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                // Create an event source for SSE
+                const eventSource = new EventSource('/poems_stream');
+                
+                // Listen for messages from the server
+                eventSource.onmessage = function(event) {
+                    // Append the received text to the result div
+                    resultDiv.textContent += event.data;
+                };
+                
+                // Handle errors
+                eventSource.onerror = function(error) {
+                    console.error('EventSource error:', error);
+                    eventSource.close();
+                };
+                
+                // Handle when the connection is closed by the server
+                eventSource.addEventListener('close', function() {
+                    eventSource.close();
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.textContent = 'An error occurred while fetching the poem.';
+            });
+        });
+    </script>
+</body>
+</html>
