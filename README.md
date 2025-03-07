@@ -11,6 +11,7 @@ My learning on technology around LLM
 - key technology:
     - Python
     - UV as package manager
+    - ClickHouse as Olap database
     - LangChain as LLM Framework
     - Groq as LLM Model provider
     - FastAPI for web frameworks
@@ -19,6 +20,6 @@ My learning on technology around LLM
 ### how to use
 
 1. clone this repo
-2. run `uv sync`
-3. run `uv run fastapi dev main.py`
-4. visit `localhost:8000`
+2. edit .env.example into .env & edit accordingly
+3. run `docker compose up -d`
+4. visit `localhost:3000`
