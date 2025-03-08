@@ -6,7 +6,7 @@ from fastapi.responses import (
 )
 from pydantic import BaseModel
 from asyncio import sleep
-from llm import prompt_template, model
+from .llm import prompt_template, model
 
 class Chat(BaseModel):
     text: str
