@@ -1,5 +1,10 @@
 langchain[groq]
+langchain-community
+langchainhub
+
 fastapi[standard]
 python-dotenv
-clickhouse-connect
 ruff
+
+clickhouse-connect
+sqlalchemy-clickhouse
