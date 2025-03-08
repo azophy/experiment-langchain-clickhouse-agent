@@ -1,3 +1,4 @@
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,6 +27,12 @@ prompt_template = ChatPromptTemplate.from_messages(
     [("system", system_template), ("user", "{text}")]
 )
 
+# connect to clickhouse
+import clickhouse_connect
+
+client = clickhouse_connect.get_client(host=os.getenv('CLICKHOUSE_HOST'), username=os.getenv('CLICKHOUSE_USER'), password=os.getenv('CLICKHOUSE_PASSWORD'))
+
+# start webserver
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import (

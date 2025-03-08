@@ -1,3 +1,5 @@
 langchain[groq]
 fastapi[standard]
 python-dotenv
+clickhouse-connect
+ruff
