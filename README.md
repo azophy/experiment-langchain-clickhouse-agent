@@ -33,3 +33,14 @@ My learning on technology around LLM
 2. edit `.env.example` into `.env` & edit accordingly (especially the API key)
 3. run `docker compose up -d`
 4. visit `localhost:3000`
+
+## Notes & learning
+- official clickhouse_connect python driver only support HTTP and SQLAlchemy version < 2.x : https://clickhouse.com/docs/integrations/python#requirements-and-compatibility
+- there are official tutorial from langchain for integrating SQL-based Q&A : https://python.langchain.com/docs/tutorials/sql_qa/#setup
+- current dependency for langchain seems only support SQLAchemy 2.x
+- there are long discussion about this topic but it seems its a dead end:
+    - https://github.com/langchain-ai/langchain/issues/2454
+    - https://github.com/langchain-ai/langchain/discussions/19691
+- detailed API References for Langchain's SQLDatabaseToolkit: https://python.langchain.com/api_reference/community/agent_toolkits/langchain_community.agent_toolkits.sql.toolkit.SQLDatabaseToolkit.html
+- there are also in-depth tutorial for building SQL agent for LangGraph. but it seems its tightly couple with langgraph: https://langchain-ai.github.io/langgraph/tutorials/sql-agent/#define-the-workflow
+- coba [setup SQLDatabase langchain](https://python.langchain.com/docs/tutorials/sql_qa/#sample-data) pakai package https://github.com/cloudflare/sqlalchemy-clickhouse dapat error terkait import di dalamnya
