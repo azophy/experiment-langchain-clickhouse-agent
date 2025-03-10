@@ -6,34 +6,27 @@ from fastapi.responses import (
 )
 from pydantic import BaseModel
 from asyncio import sleep
-from .llm import prompt_template, model
+from .llm import create_poem_single, create_poem_stream, query_llm_clickhouse
 
-class Chat(BaseModel):
+class PoemChat(BaseModel):
     text: str
     line_number: float
+
+class DbQueryChat(BaseModel):
+    query: str
 
 app = FastAPI()
 
 @app.post("/poems")
-async def chat(chat: Chat):
-    prompt = prompt_template.invoke({"line_number": chat.line_number, "text": chat.text})
-
-    #for token in model.stream(prompt):
-    #    print(token.content, end="|")
-
-    return {"result": model.invoke(prompt) }
+async def chat(chat: PoemChat):
+    return {"result": create_poem_single(chat.line_number, chat.text) }
 
 @app.post("/poems_stream")
-async def chat(chat: Chat):
-    prompt = prompt_template.invoke({"line_number": chat.line_number, "text": chat.text})
+async def chat(chat: PoemChat):
+    return StreamingResponse(create_poem_stream(chat.line_number, chat.text), media_type="text/event-stream")
 
-    def stream_chat():
-        for token in model.stream(prompt):
-            #yield f"event: newtext\ndata: {token.content}\n\n"
-            yield token.content
-            sleep(1)
-
-
-    return StreamingResponse(stream_chat(), media_type="text/event-stream")
+@app.post("/query_clickhouse")
+async def chat(chat: DbQueryChat):
+    return StreamingResponse(query_llm_clickhouse(chat.query), media_type="text/event-stream")
 
 app.mount("/", StaticFiles(directory="static",html = True), name="static")

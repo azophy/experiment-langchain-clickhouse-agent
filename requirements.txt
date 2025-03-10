@@ -1,6 +1,7 @@
 langchain[groq]
 langchain-community
 langchainhub
+langgraph
 
 fastapi[standard]
 python-dotenv

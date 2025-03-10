@@ -3,7 +3,7 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install uv
-RUN pip install uv
+RUN apt update -y && apt install -y gcc && pip install uv
 
 # Copy requirements file
 COPY requirements.txt .

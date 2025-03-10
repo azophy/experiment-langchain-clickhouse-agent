@@ -3,58 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Query Clickhouse</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        #result {
-            background:#ddd;
-            width:100%;
-            overflow: scroll;
-            max-height:50vh;
-        }
-    </style>
+    <title>Poem Streaming</title>
 </head>
 <body>
-    <main style="width:500px">
-        <h1>Query Clickhouse</h1>
-        
-        <form id="queryDbForm">
-            <div>
-                <label for="db_query">Query:</label>
-                <textarea id="db_query" name="db_query" rows=5 cols=80 required>Please list total new confirmed case for each month</textarea>
-            </div>
-            <button type="submit">Query Clickhouse</button>
-        </form>
+    <main style="width:500px;margin:auto">
+    <h1>Poem Generator</h1>
+    
+    <form id="poemForm">
+        <div>
+            <label for="line_numbr">Number of Lines:</label>
+            <input type="number" id="line_numbr" name="line_numbr" required>
+        </div>
+        <div>
+            <label for="text">Topic:</label>
+            <input type="text" id="text" name="text" required>
+        </div>
+        <button type="submit">Generate Poem</button>
+    </form>
+
+    <pre style="background:#ddd;width:100%" id="result"></pre>
     </main>
-    <pre id="result"></pre>
 
     <script>
-        document.getElementById('queryDbForm').addEventListener('submit', async function(e) {
+        document.getElementById('poemForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const db_query = document.getElementById('db_query').value;
+            const lineNumber = document.getElementById('line_numbr').value;
+            const text = document.getElementById('text').value;
             
             const resultDiv = document.getElementById('result');
             resultDiv.textContent = '';
             
             // Prepare the data as JSON
             const jsonData = {
-                query: db_query,
+                line_number: lineNumber,
+                text: text
             };
             
             try {
                 // Make the POST request with JSON
-                const response = await fetch('/query_clickhouse', {
+                const response = await fetch('/poems_stream', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
