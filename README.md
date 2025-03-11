@@ -3,6 +3,11 @@ Experiment With LLM
 
 My learning on technology around LLM
 
+## Components
+- main.py : main webserver files a.k.a the http handler/controller
+- llm.py : contains all LLM-related code, including all LangGraph agent setup
+- clickhouse.py : contains Clickhouse connection setup, provide basic tools to be consumed by llm.py as LLM Agent tool
+
 ## progress on 2025-03-10
 
 ![ClickhouseBot Screenshot](misc/screenshot-clickhouse.png?raw=true "ClickhouseBot Screenshot")
@@ -27,7 +32,7 @@ My learning on technology around LLM
     - FastAPI for web frameworks
     - the frontend is using vanilla javascript with Server-Sent Event for streaming response
 
-### how to use
+## how to use
 
 1. clone this repo
 2. edit `.env.example` into `.env` & edit accordingly (especially the API key)

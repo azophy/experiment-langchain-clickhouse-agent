@@ -50,9 +50,14 @@ sql_system_message = sql_prompt_template.format(dialect="Clickhouse", top_k=5)
 
 # initialize agent
 from langgraph.prebuilt import create_react_agent
+from langchain_core.tools import StructuredTool
 from .clickhouse import list_tables, get_table_schema, db_query_tool
 
-tools = [ list_tables, get_table_schema, db_query_tool ]
+tool_functions = [ list_tables, get_table_schema, db_query_tool ]
+tools = [
+    StructuredTool.from_function(func=f)
+    for f in tool_functions
+]
 agent_executor = create_react_agent(model, tools, prompt=sql_system_message)
 
 def query_llm_clickhouse(question):
@@ -60,7 +65,7 @@ def query_llm_clickhouse(question):
         {"messages": [{"role": "user", "content": question}]},
         stream_mode="values",
     ):
-        yield step["messages"][-1].pretty_repr()
+        yield step["messages"][-1]
 
 if __name__ == '__main__':
     question = "Please list total new confirmed case for each month"

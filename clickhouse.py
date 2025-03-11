@@ -13,8 +13,6 @@ import clickhouse_connect
 def get_client():
     return clickhouse_connect.get_client(host=CLICKHOUSE_HOST, username=CLICKHOUSE_USER, password=CLICKHOUSE_PASSWORD)
 
-from langchain_core.tools import tool
-
 def join_query_row(result, separator='|'):
     return separator.join(map(str, result))
 
@@ -24,7 +22,6 @@ def join_query_results(result, col_separator='|', row_separator="\n"):
     ])
 
 # lanchain tools based on tutorial in: https://langchain-ai.github.io/langgraph/tutorials/sql-agent/#define-tools-for-the-agent
-@tool
 def list_tables() -> str:
     """
     Get list of available tables inside database
@@ -33,10 +30,9 @@ def list_tables() -> str:
     res = client.query('SHOW tables');
     return join_query_row(res.result_rows[0])
 
-@tool
 def get_table_schema(table_name: str) -> str:
     """
-    Retrieve SQL schema of the provide table_name
+    Retrieve SQL schema of the provided table_name + 3 sample table contents
     """
     client = get_client()
     # get create query
@@ -51,7 +47,6 @@ def get_table_schema(table_name: str) -> str:
 
     return final_res
 
-@tool
 def db_query_tool(query: str) -> str:
     """
     Execute a SQL query against the database and get back the result.
@@ -65,6 +60,6 @@ def db_query_tool(query: str) -> str:
     return join_query_results(result.result_rows)
 
 if __name__ == '__main__':
-    print(list_tables.invoke(''))
-    print(get_table_schema.invoke('covid19'))
-    print(db_query_tool.invoke("SELECT formatReadableQuantity(count()) FROM covid19"))
+    print(list_tables())
+    print(get_table_schema('covid19'))
+    print(db_query_tool("SELECT formatReadableQuantity(count()) FROM covid19"))

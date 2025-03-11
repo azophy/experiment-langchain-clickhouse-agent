@@ -4,6 +4,7 @@ langchainhub
 langgraph
 
 fastapi[standard]
+sse-starlette
 python-dotenv
 ruff
 

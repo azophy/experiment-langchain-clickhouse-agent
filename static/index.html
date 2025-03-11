@@ -16,11 +16,18 @@
             box-sizing: border-box;
         }
 
-        #result {
+        .result {
             background:#ddd;
             width:100%;
             overflow: scroll;
             max-height:50vh;
+        }
+
+        span.response {
+            border: 3px solid #fff;
+            padding: 5px;
+            margin: 0 20px;
+            display: block;
         }
     </style>
 </head>
@@ -36,15 +43,20 @@
             <button type="submit">Query Clickhouse</button>
         </form>
     </main>
-    <pre id="result"></pre>
+    <button id="toggle_result">toggle result display</button>
+    <div class="result" id="result" style="display:block"></div>
+    <pre class="result" id="result_raw" style="display:none"></pre>
 
     <script>
+        const resultRawDiv = document.getElementById('result_raw');
+        const resultDiv = document.getElementById('result');
+
         document.getElementById('queryDbForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const db_query = document.getElementById('db_query').value;
             
-            const resultDiv = document.getElementById('result');
+            resultRawDiv.textContent = '';
             resultDiv.textContent = '';
             
             // Prepare the data as JSON
@@ -80,12 +92,41 @@
                     
                     // Decode and display the chunk
                     const text = decoder.decode(value, { stream: true });
-                    resultDiv.textContent += text;
+                    resultRawDiv.textContent += text;
+
+                    // manually parse eventSource object
+                    let eventItem = {}
+                    text.split("\n").filter(Boolean).map(
+                        (s) => {
+                            var i = s.indexOf(':');
+                            var key = s.slice(0, i).trim();
+                            var val = s.slice(i + 1, s.length).trim();
+
+                            eventItem[key] = val
+                        }
+                    )
+
+                    eventItem.data = JSON.parse(eventItem.data)
+
+                    let content = eventItem.event + " | ";
+                    if (eventItem.data.tool) {
+                        content += " tool call:<br/>";
+                        eventItem.data.tool.map((t) => { content += `- ${t.name} | ${JSON.stringify(t.args)}<br/>` })
+                    } else {
+                        content += eventItem.data.content + "\n";
+                    }
+                    
+                    resultDiv.innerHTML += `<span class="response">${content}</span>`
                 }
             } catch (error) {
                 console.error('Error:', error);
                 resultDiv.textContent = 'An error occurred while fetching the poem.';
             }
+        });
+
+        document.getElementById('toggle_result').addEventListener('click', function(e) {
+            resultDiv.style.display = (resultDiv.style.display != 'none') ? 'none' : 'block' 
+            resultRawDiv.style.display = (resultRawDiv.style.display != 'none') ? 'none' : 'block' 
         });
     </script>
 </body>
