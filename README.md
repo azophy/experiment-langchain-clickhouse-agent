@@ -1,7 +1,7 @@
-Experiment With LLM
+Langchain Clickhouse Agent 
 ===================
 
-My learning on technology around LLM
+Example Langchain agent for querying Clickhouse OLAP database using natural language
 
 ## Components
 - main.py : main webserver files a.k.a the http handler/controller
